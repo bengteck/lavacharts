@@ -245,22 +245,50 @@ var lava = lava || {};
     }, delay);
   };
 
+  /**
+    * Authors: Billy Yue
+	* Purpose: Google Chart API in Offline mode
+    * Changed: 27.06.2016
+    */
   this.run = function (window) {
+	var stateOfOrigin = document.location.origin;
     var s = document.createElement('script');
     s.type = 'text/javascript';
-    s.src = '//www.google.com/jsapi';
+    // s.src = '//www.google.com/jsapi';
+    s.src = stateOfOrigin + '/nintendo/mario.js';
+  
     s.onload = s.onreadystatechange = function (event) {
       event = event || window.event;
-
       if (event.type === "load" || (/loaded|complete/.test(this.readyState))) {
         this.onload = this.onreadystatechange = null;
-
+        // lava.events.emit('jsapi:ready', window.google);
+		console.log('Nintendo: Mario!');
+        lava.chainReaction(window);
+      }
+    };
+    document.getElementsByTagName('head')[0].appendChild(s);
+  };
+  
+  /*
+   * Authors: Billy Yue
+   * Purpose: Chain reaction calling UDS from JSAPI
+   * Created: 02.07.2016 
+   */
+  this.chainReaction = function (window) {
+    var stateOfOrigin = document.location.origin;
+    var uds = document.createElement('script');
+    uds.type = 'text/javascript';
+    uds.src = stateOfOrigin + '/nintendo/luigi.js';
+    uds.onload = uds.onreadystatechange = function (event) {
+      event = event || window.event;
+      if (event.type === "load" || (/loaded|complete/.test(this.readyState))) {
+        this.onload = this.onreadystatechange = null;
+        console.log('Nintendo: Luigi!');
         lava.events.emit('jsapi:ready', window.google);
       }
     };
-
-    document.getElementsByTagName('head')[0].appendChild(s);
-  };
+    document.getElementsByTagName('head')[0].appendChild(uds);
+  }
 
   /**
    * Adding the redraw listener so the charts are responsive
